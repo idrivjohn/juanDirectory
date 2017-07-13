@@ -4,11 +4,11 @@ class PAGEConfig {
   public $config;
   private $pageData;
   public function __construct(){
-	  $this -> pageData['PROJECTNAMESPACE'] = 'jva-til-videolab';
-	  $this -> pageData['DISPLAYNAME'] = 'videolab.com';
-	  $this -> pageData['TAGLINE'] = 'The TIL PRO-duction File Manager';
-	  $this -> pageData['DESCRIPTION'] = 'A place where everyone can meet.';
-	  $this -> pageData['HTTPSPROTOCOL'] = false;
+	  $this -> pageData['PROJECTNAMESPACE'] = 'project-namespace'; //optional
+	  $this -> pageData['DISPLAYNAME'] = 'displayname';//title page
+	  $this -> pageData['TAGLINE'] = 'short description';
+	  $this -> pageData['DESCRIPTION'] = 'full description';
+	  $this -> pageData['HTTPSPROTOCOL'] = false; //force to use https protocol true/false
   }
   
   public function returnConfig(){
