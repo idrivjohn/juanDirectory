@@ -1,0 +1,281 @@
+@import url(vendor/normalize.css);
+@import url(vendor/bootstrap.min.css);
+/* 
+		CSS by Lentie Ward @ https://codepen.io/lentilz/pen/ivhcx/
+		START
+*/
+@import url(http://weloveiconfonts.com/api/?family=brandico|entypo);
+/* entypo */
+[class*="entypo-"]:before {
+  font-family: 'entypo', sans-serif;
+  padding-right: 10px;
+}
+
+*, *:before, *:after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  border: 0;
+}
+
+ul {
+  list-style: none;
+}
+
+a {
+  color: white;
+  text-decoration: none;
+}
+
+#browser {
+  margin: 15px auto;
+  color: white;
+  width: 96%;
+	max-width: 1200px;
+  -webkit-box-shadow: 2px 5px 15px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 2px 5px 15px rgba(0, 0, 0, 0.5);
+  box-shadow: 2px 5px 15px rgba(0, 0, 0, 0.5);
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 6px;
+	overflow: hidden;
+}
+
+#browser-bar {
+  background: #394141;
+  width: 100%;
+  padding: 8px;
+  margin: 0 auto;
+  font-weight: 300;
+  /*font-size: 0.9em;*/
+  position: relative;
+}
+#browser-bar p {
+  text-align: center;
+}
+#browser-bar .circles {
+  border-radius: 10px;
+  height: 13px;
+  width: 13px;
+  background: #ff5e5c;
+  float: left;
+  margin-left: 7px;
+  margin-top: 3px;
+	border: 1px solid #e54142;
+}
+#browser-bar .circles:nth-of-type(2) {
+  background: #ffbc4d;
+	border-color: #e29e3f;
+}
+#browser-bar .circles:nth-of-type(3) {
+  background: #00cc57;
+	border-color: #12ab44;
+}
+
+.arrow {
+  position: absolute;
+  right: 3px;
+  top: 6px;
+	font-size: 150%;
+  /*font-size: 1.2em;*/
+  color: #8e9699;
+}
+
+#content {
+  background: #454f4f;
+}
+#content:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+#content #left, #content #right {
+  height: 100%;
+}
+#content #left {
+  float: left;
+  width: 75%;
+  background: #7BC087;
+}
+@media all and (max-width: 780px) {
+  #content #left {
+    width: 100%;
+  }
+}
+#content #left #container {
+  height: 388px;
+  position: relative;
+  background-size: cover;
+}
+#content #left #container p {
+  text-transform: uppercase;
+  padding-top: 20px;
+  padding-left: 30px;
+  /*font-size: 0.9em;*/
+  font-weight: 600;
+}
+
+#content #left #footer {
+  width: 100%;
+  text-align: center;
+  background:#4c8254;
+	font-size: 75%;
+	/*font-size: 0.75em;*/
+	padding: 5px 0 7px;
+	margin-bottom: 0;
+}
+#content #right {
+  float: left;
+  width: 25%;
+  background: #454f4f;
+  /*font-size: 0.75em;*/
+  padding: 15px;
+}
+@media all and (max-width: 780px) {
+  #content #right {
+    width: 100%;
+  }
+}
+#content #right p {
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+#content #right a:hover {
+  color: #51B2D6;
+}
+#content #right form {
+ /* border-top: solid thin #8e9699;*/
+  border-bottom: solid thin #8e9699;
+  margin: 20px 0;
+  padding: 20px 0;
+}
+#content #right form input,
+#content #right form textarea {
+  background: #394141;
+  padding: 8px;
+  margin-bottom: 8px;
+  width: 100%;
+  color: white;
+}
+#content #right form input:last-of-type,
+#content #right form textarea:last-of-type {
+  margin-bottom: 0;
+}
+#content #right form input[type='submit'],
+#content #right form textarea[type='submit'] {
+  text-transform: uppercase;
+  background: #ff3434;
+  width: 50%;
+  color: white;
+  margin-top: 5px;
+}
+#content #right form input[type='submit']:hover,
+#content #right form textarea[type='submit']:hover {
+  background: #f42a2a;
+  -webkit-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+#content #right form input[type='textarea'],
+#content #right form textarea[type='textarea'] {
+  min-height: 75px;
+  vertical-align: text-top;
+}
+#content #right p.other {
+  font-size: 75%;
+  margin-bottom: 5px;
+  text-transform: none;
+  font-weight: 100;
+	padding-left: 15px;
+	
+}
+#content #right p.other,
+#content #right p.other a {
+  color: #8e9699;
+}
+#content #right [class*="entypo-"]:before {
+  margin-left:-10px;
+	padding-right: 5px;
+}
+/* 
+		END
+		CSS Design Lentie Ward @ https://codepen.io/lentilz/pen/ivhcx/
+*/
+@font-face {
+  font-family: 'Lato';
+  src: url('../fonts/Lato-Black.eot');
+  src: url('../fonts/Lato-Black.eot?#iefix') format('embedded-opentype')
+     url('../fonts/Lato-Black.woff') format('woff'),
+     url('../fonts/Lato-Black.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  text-rendering: optimizeLegibility;
+}
+
+@font-face {
+  font-family: 'Lato';
+  src: url('../fonts/Lato-Regular.eot');
+  src: url('../fonts/Lato-Regular.eot?#iefix') format('embedded-opentype')
+     url('../fonts/Lato-Regular.woff') format('woff'),
+     url('../fonts/Lato-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  text-rendering: optimizeLegibility;
+}
+html, body{
+  font-size:14px;
+  line-height:16px;
+  color:#231F20;
+  background:#829292;
+  font-family: 'Lato', Verdana, Geneva, sans-serif;
+  font-weight:400;
+}
+
+/*
+
+@font-face {
+  font-family: 'Nexa';
+  src: url('../fonts/nexa-bold-webfont.eot');
+  src: url('../fonts/nexa-bold-webfont.eot?#iefix') format('embedded-opentype')
+     url('../fonts/nexa-bold-webfont.woff') format('woff'),
+     url('../fonts/nexa-bold-webfont.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  text-rendering: optimizeLegibility;
+}
+html{
+  font-size:14px;
+  line-height:16px;
+  color:#231F20;
+  background:#ffffff;
+  font-family: 'Lato', Verdana, Geneva, sans-serif;
+  font-weight:400;
+}
+
+a{
+  text-decoration:none;
+  color:inherit;
+}
+
+h2{
+  text-transform: uppercase;
+  font-size: 22px;
+  line-height: inherit;
+}
+h3{
+  text-transform: uppercase;
+  font-size: 16px;
+  line-height: inherit;
+}
+
+#canvas{
+  width:96%;
+  min-width:768px;
+  margin:20px auto;
+  position:relative;
+}
+
+@media all and (max-width:768px){
+
+}*/
+
