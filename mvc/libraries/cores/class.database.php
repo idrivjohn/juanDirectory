@@ -2,10 +2,10 @@
 /**
  * JUANdirectory PHP Model-View-Controller Setup
  *
- * class.databasea.php V1.201
+ * class.databasea.php V1.301
  *
  * Author/Contributor : John Virdi V. Alfonso
- * Date   : 18 February 2016
+ * Date   : 13 July 2017
  * Email  : jva.ipampanga@gmail.com
  * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
