@@ -99,8 +99,6 @@ echo ' -->';*/
       <form action="login" method="POST" id="frm-login" novalidate>
 				<div class="loader"><span></span></div>
         <p>Login</p>
-        <input placeholder="Name" type="text" name="name" required>
-        <input placeholder="Company" type="text" name="company" required>
         <input placeholder="Email" type="email" name="email" required>
         <input placeholder="Password" type="password" name="password" required>
         <input name="form-signature" type="hidden" value="<?= $_SESSION[$this -> MVCdata['formSignature']] ?>" />
