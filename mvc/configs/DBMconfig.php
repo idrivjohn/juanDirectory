@@ -21,10 +21,10 @@
 class DBMConfig{
   private $DBdata;
   public function __construct(){
-	$this -> DBdata['DBuser'] = 'promolab_videoer';
-	$this -> DBdata['DBpwd'] = '%zLdf8F]sT9t';
-	$this -> DBdata['DBname'] = 'promolab_videolab';
-	$this -> DBdata['DBkey'] = '7JoHN12vIrDi160vArGAs019ALfOnSo8';
+	$this -> DBdata['DBuser'] = 'database user';
+	$this -> DBdata['DBpwd'] = 'password';
+	$this -> DBdata['DBname'] = 'database name';
+	$this -> DBdata['DBkey'] = '32characterslongkeyforencryption';
   }
   
   protected function dbConfig(){
