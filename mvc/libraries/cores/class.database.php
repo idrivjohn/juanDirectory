@@ -2,10 +2,10 @@
 /**
  * JUANdirectory PHP Model-View-Controller Setup
  *
- * class.databasea.php V1.301
+ * class.database.php V1.4
  *
  * Author/Contributor : John Virdi V. Alfonso
- * Date   : 13 July 2017
+ * Date   : 19 July 2017
  * Email  : jva.ipampanga@gmail.com
  * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -330,9 +330,11 @@ class Database extends Application{
 	private function aesEncrypt($value, $pKey = NULL){
 		if (strlen($value)>1){
 			$pkey = $pKey ? $pKey : $this->config['pkey'];
-			$iv_size = mcrypt_get_iv_size(\MCRYPT_RIJNDAEL_256, \MCRYPT_MODE_CBC);
-			$iv = mcrypt_create_iv($iv_size,\MCRYPT_RAND);
-			return base64_encode($iv.mcrypt_encrypt(\MCRYPT_RIJNDAEL_256, $pKey, $value, \MCRYPT_MODE_CBC, $iv));
+			//$iv_size = mcrypt_get_iv_size(\MCRYPT_RIJNDAEL_256, \MCRYPT_MODE_CBC);
+			//$iv = mcrypt_create_iv($iv_size,\MCRYPT_RAND);
+			//return base64_encode($iv.mcrypt_encrypt(\MCRYPT_RIJNDAEL_256, $pKey, $value, \MCRYPT_MODE_CBC, $iv));
+			$iv = openssl_random_pseudo_bytes (openssl_cipher_iv_length ('aes-256-ctr'));
+			return base64_encode(openssl_encrypt ($value, 'aes-256-ctr',$pKey,OPENSSL_RAW_DATA, $iv).'::'.$iv);
 		} 
 		return '';
 	}
@@ -347,10 +349,12 @@ class Database extends Application{
 		if (strlen($value)>1){
 			$pkey = $pKey ? $pKey : $this->config['pkey'];
 			$value = base64_decode($value);
-			$iv_size = mcrypt_get_iv_size(\MCRYPT_RIJNDAEL_256, \MCRYPT_MODE_CBC);
-			$iv = substr($value,0,$iv_size);
-			$value = substr($value,$iv_size);
-			return trim(mcrypt_decrypt(\MCRYPT_RIJNDAEL_256, $pKey, $value, \MCRYPT_MODE_CBC, $iv));
+			//$iv_size = mcrypt_get_iv_size(\MCRYPT_RIJNDAEL_256, \MCRYPT_MODE_CBC);
+			//$iv = substr($value,0,$iv_size);
+			//$value = substr($value,$iv_size);
+			//return trim(mcrypt_decrypt(\MCRYPT_RIJNDAEL_256, $pKey, $value, \MCRYPT_MODE_CBC, $iv));
+			list($data, $iv) = explode('::',$value,2);
+			return openssl_decrypt($data, 'aes-256-ctr',$pKey,OPENSSL_RAW_DATA, $iv);
 		}
 		return '';
 	}
