@@ -2,10 +2,10 @@
 /**
  * JUANdirectory PHP Model-View-Controller Setup
  *
- * router.php V1.04
+ * router.php V1.05
  *
  * Author/Contributor : John Virdi V. Alfonso
- * Update   : 18 May 2017
+ * Update   : 21 Jul 2017
  * Email  : jva.ipampanga@gmail.com
  * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -221,10 +221,12 @@
 		define('SHORTLINK',$basehref);
   }
 
-  $defaultMethod = str_replace('-','_',strtolower($defaultParams['method'])); 
+  $defaultMethod = $defaultParams['method']; 
 	$appMethod = !empty($params) ? array_shift($params) : $defaultMethod;
+	
+	$appMethod = str_replace('-','_',strtolower($appMethod)); // New-Method will be new_method
 
-  if(!$newClassController)//$classController)
+  if(!$newClassController)
 		$newClassController = '_404';
 
   if($MVCparams['pageMeta']['currentPage'] === $MVCparams['paths'][0])
@@ -246,7 +248,7 @@
 	if(!class_exists($newClassController) && $sandbox)
   	exit("Sorry $newFileController file could not load class $newClassController."); 
 	elseif(!class_exists($newClassController))
-		$newClassController = '_404'; ///404
+		$newClassController = '_404';
 
 		$classController = new $newClassController($MVCparams);
 	
