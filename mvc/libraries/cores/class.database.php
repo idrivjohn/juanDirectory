@@ -5,7 +5,7 @@
  * class.database.php V1.4
  *
  * Author/Contributor : John Virdi V. Alfonso
- * Date   : 19 July 2017
+ * Date   : 21 July 2017
  * Email  : jva.ipampanga@gmail.com
  * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -28,40 +28,41 @@ use PDO;
 class Database extends Application{
   private $PDODB;
   private $config;
-  function __construct(){
+  function __construct($useMasterConfigs=false){
 	parent :: __construct();
-		// DBMConfig will load master DB settings or load local DB settings if available ROOTDIR.APPLICATIONFOLDERDIR.DS.'configs/DBconfig.php';
-		$this -> loadFile(array(
-			'name' => 'DBMconfig.php',
-			'path' => 'configs'.DS
-		));	
-		$DBconfig =  new \DBMConfig();
+	// DBMConfig will load master DB settings or load local DB settings if available ROOTDIR.APPLICATIONFOLDERDIR.DS.'configs/DBconfig.php';
+	$this -> loadFile(array(
+	  'name' => 'DBMconfig.php',
+	  'path' => 'configs'.DS
+	));	
+	
+	$DBconfig =  new \DBMConfig($useMasterConfigs);  
+	$this -> config = $DBconfig -> config();
 
-		$this -> config = $DBconfig -> config();
-		$this -> connectSQL();//database, user, password, pkey
+	$this -> connectSQL();//database, user, password, pkey
   }
   
   private function connectSQL(){
-		if(isset($this->config['pkey'])){
-			if (strlen($this->config['pkey']) !== 32){
-			throw new \Exception("aes_pkey must be 32 characters in length! ".strlen($this->config['pkey'])." provided");
-			die;
-			}
-		}
-		try{
-			$host = 'localhost';
-
-			if(isset($this->config['host']))
-				$host = $this->config['host'];
-
-			$this -> PDODB = new \PDO('mysql:host='.$host.';port=3306;dbname='.$this->config['database'].';charset=utf8', $this->config['user'], $this->config['password']);
-			$this -> PDODB ->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-			$this -> PDODB ->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-
-		}catch (\PDOException $e) {
-			print "Error!: " . $e->getMessage() . "<br/>";
-			die;
-		}
+	if(isset($this->config['pkey'])){
+	  if (strlen($this->config['pkey']) !== 32){
+		throw new \Exception("aes_pkey must be 32 characters in length! ".strlen($this->config['pkey'])." provided");
+		die;
+	  }
+	}
+	try{
+	  $host = 'localhost';
+	  
+	  if(isset($this->config['host']))
+	    $host = $this->config['host'];
+	 
+	  $this -> PDODB = new \PDO('mysql:host='.$host.';port=3306;dbname='.$this->config['database'].';charset=utf8', $this->config['user'], $this->config['password']);
+	  $this -> PDODB ->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	  $this -> PDODB ->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+	  
+	}catch (\PDOException $e) {
+	  print "Error!: " . $e->getMessage() . "<br/>";
+	  die;
+	}
   }
   
 	public function beginTransaction(){
@@ -329,11 +330,13 @@ class Database extends Application{
 	*/	
 	private function aesEncrypt($value, $pKey = NULL){
 		if (strlen($value)>1){
-			$pkey = $pKey ? $pKey : $this->config['pkey'];
-			//$iv_size = mcrypt_get_iv_size(\MCRYPT_RIJNDAEL_256, \MCRYPT_MODE_CBC);
-			//$iv = mcrypt_create_iv($iv_size,\MCRYPT_RAND);
-			//return base64_encode($iv.mcrypt_encrypt(\MCRYPT_RIJNDAEL_256, $pKey, $value, \MCRYPT_MODE_CBC, $iv));
+			$pKey = $pKey ? $pKey : $this->config['pkey'];
+			//$key = substr(sha1($pkey,true),0,16);
 			$iv = openssl_random_pseudo_bytes (openssl_cipher_iv_length ('aes-256-ctr'));
+			/*
+			$iv_size = mcrypt_get_iv_size(\MCRYPT_RIJNDAEL_256, \MCRYPT_MODE_CBC);
+			$iv = mcrypt_create_iv($iv_size,\MCRYPT_RAND);
+			return base64_encode($iv.mcrypt_encrypt(\MCRYPT_RIJNDAEL_256, $pKey, $value, \MCRYPT_MODE_CBC, $iv));*/
 			return base64_encode(openssl_encrypt ($value, 'aes-256-ctr',$pKey,OPENSSL_RAW_DATA, $iv).'::'.$iv);
 		} 
 		return '';
@@ -347,14 +350,17 @@ class Database extends Application{
 	*/
 	private function aesDecrypt($value, $pKey = NULL){
 		if (strlen($value)>1){
-			$pkey = $pKey ? $pKey : $this->config['pkey'];
+			//$key = substr(sha1($pkey,true),0,16);
+			$pKey = $pKey ? $pKey : $this->config['pkey'];
 			$value = base64_decode($value);
-			//$iv_size = mcrypt_get_iv_size(\MCRYPT_RIJNDAEL_256, \MCRYPT_MODE_CBC);
-			//$iv = substr($value,0,$iv_size);
-			//$value = substr($value,$iv_size);
-			//return trim(mcrypt_decrypt(\MCRYPT_RIJNDAEL_256, $pKey, $value, \MCRYPT_MODE_CBC, $iv));
 			list($data, $iv) = explode('::',$value,2);
 			return openssl_decrypt($data, 'aes-256-ctr',$pKey,OPENSSL_RAW_DATA, $iv);
+			/*$pkey = $pKey ? $pKey : $this->config['pkey'];
+			$value = base64_decode($value);
+			$iv_size = mcrypt_get_iv_size(\MCRYPT_RIJNDAEL_256, \MCRYPT_MODE_CBC);
+			$iv = substr($value,0,$iv_size);
+			$value = substr($value,$iv_size);
+			return trim(mcrypt_decrypt(\MCRYPT_RIJNDAEL_256, $pKey, $value, \MCRYPT_MODE_CBC, $iv));*/
 		}
 		return '';
 	}
