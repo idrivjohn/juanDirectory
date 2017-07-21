@@ -2,10 +2,10 @@
 /**
  * JUANdirectory PHP Model-View-Controller Setup
  *
- * router.php V1.03
+ * router.php V1.04
  *
  * Author/Contributor : John Virdi V. Alfonso
- * Update   : 19 August 2015
+ * Update   : 18 May 2017
  * Email  : jva.ipampanga@gmail.com
  * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -17,8 +17,8 @@
  * DEALINGS IN THE SOFTWARE.
 **/
   (!defined('ROOTDIR'))?die('ILLEGAL ACCESS OF FILE'):'';
-  
- 
+	$sandbox = false;
+
   $MVCparams = array() ;
   $MVCparams['device'] = $this -> getDevicePlatform();
     
@@ -27,130 +27,126 @@
   
   $defaultParams = $this -> getDefaultParams();
   $params = $this -> parseURL();
-  //echo json_encode($params);
-  if($params)
+ 
+	if($params)
     $MVCparams['paths'] = array();
 	
   $MVCparams['params'] = array();
   
-  if($params)
-	$tempApp = strtolower(array_shift($params));
-  else
-    $tempApp = strtolower($defaultParams['app']);
+	$tempApp = !empty($params) ? strtolower(array_shift($params)) : strtolower($defaultParams['app']);
 
-  
-  
   $isDirectory = $this -> checkDirectory(array(
-	'name' => strtolower($tempApp),
-	'path' => 'applications'.DS
+		'name' => strtolower($tempApp),
+		'path' => 'applications'.DS
   ));
   
   $appClass =  strtolower($defaultParams['classController']);
-    
  
   if($isDirectory){
-	$appFolder =  $tempApp; 
-	if($params){
-	  $appClass = array_shift($params);
-	}
-	
-    $isPageConfig = $this -> checkFile(array(
-	  'name' => 'pageConfig.php',
-	  'path' => $appFolderDIR.DS.'configs'.DS
-	));
-	
-	$isFBConfig = $this -> checkFile(array(
-	  'name' => 'FBconfig.php',
-	  'path' => $appFolderDIR.DS.'configs'.DS
-	));
-	
+		$appFolder =  $tempApp; 
+		
+		if($params){
+			$appClass = array_shift($params);
+		}
+
+		$isPageConfig = $this -> checkFile(array(
+			'name' => 'pageConfig.php',
+			'path' => $appFolderDIR.DS.'configs'.DS
+		));
+
+		$isFBConfig = $this -> checkFile(array(
+			'name' => 'FBconfig.php',
+			'path' => $appFolderDIR.DS.'configs'.DS
+		));
   }else{
     $appFolder =  strtolower($defaultParams['app']);
-	$appClass = $tempApp;
+		$appClass = $tempApp;//setNewName($tempApp,'class');  //app-class will be App_Class
   }
-  
+	
   $MVCparams['params']['folder'] = $appFolder;
-  
   $currentFolder = $appFolder;
   $appFolderDIR = 'applications'.DS.$currentFolder;
   $defaultFolderDIR = 'applications'.DS.strtolower($defaultParams['app']);
   
   $isPageConfig = $this -> checkFile(array(
-	'name' => 'pageConfig.php',
-	'path' => $appFolderDIR.DS.'configs'.DS
+		'name' => 'pageConfig.php',
+		'path' => $appFolderDIR.DS.'configs'.DS
   ));
   
   $isFBConfig = $this -> checkFile(array(
-	'name' => 'FBconfig.php',
-	'path' => $appFolderDIR.DS.'configs'.DS
+		'name' => 'FBconfig.php',
+		'path' => $appFolderDIR.DS.'configs'.DS
   ));
   
   $pageConfigFolder = '';
   if($isPageConfig){
-	$pageConfigFolder = $appFolderDIR.DS.'configs'.DS;
+		$pageConfigFolder = $appFolderDIR.DS.'configs'.DS;
   }else{
-	$isPageConfig = $this -> checkFile(array(
-	  'name' => 'pageConfig.php',
-	  'path' => $defaultFolderDIR.DS.'configs'.DS
-	));
+		$isPageConfig = $this -> checkFile(array(
+			'name' => 'pageConfig.php',
+			'path' => $defaultFolderDIR.DS.'configs'.DS
+		));
     if($isPageConfig)
-	  $pageConfigFolder = $defaultFolderDIR.DS.'configs'.DS;
+			$pageConfigFolder = $defaultFolderDIR.DS.'configs'.DS;
   }
+
   if($pageConfigFolder){
-	$this -> loadFile(array(
-	  'name' => 'pageConfig.php',
-	  'path' => $pageConfigFolder
-	));
-	$defaultPageConfigs = new PAGEConfig(); 
-	$MVCparams['pageMeta'] = $defaultPageConfigs -> returnConfig();
-  }
+		$this -> loadFile(array(
+			'name' => 'pageConfig.php',
+			'path' => $pageConfigFolder
+		));
+		$defaultPageConfigs = new PAGEConfig(); 
+		$MVCparams['pageMeta'] = $defaultPageConfigs -> returnConfig();
+		if(isset($MVCparams['pageMeta']['sandbox']))
+			$sandbox = $MVCparams['pageMeta']['sandbox'];
+		if($defaultPageConfigs -> appProtocol()) // https protocol is true
+			if(empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == "off"){
+				$redirect = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+				header('HTTP/1.1 301 Moved Permanently');
+				header('Location: ' . $redirect);
+				exit();
+			}
+		}
+  
   $FBconfigFolder = '';
   
   if($isFBConfig){
-	$FBconfigFolder = $appFolderDIR.DS.'configs'.DS;
+		$FBconfigFolder = $appFolderDIR.DS.'configs'.DS;
   }else{
-	$isFBConfig = $this -> checkFile(array(
-	  'name' => 'FBconfig.php',
-	  'path' => $defaultFolderDIR.DS.'configs'.DS
-	));
-	if($isFBConfig)
-	  $FBconfigFolder = $defaultFolderDIR.DS.'configs'.DS;
+		$isFBConfig = $this -> checkFile(array(
+			'name' => 'FBconfig.php',
+			'path' => $defaultFolderDIR.DS.'configs'.DS
+		));
+		if($isFBConfig)
+			$FBconfigFolder = $defaultFolderDIR.DS.'configs'.DS;
+	}
+	
+	if($FBconfigFolder){
+		$this -> loadFile(array(
+			'name' => 'FBconfig.php',
+			'path' => $FBconfigFolder
+		));
+		$defaultPageConfigs = new FBappConfig(); 
+		$MVCparams['pageMeta'] = $defaultPageConfigs -> pageConfig();
+		$MVCparams['appMeta'] = $defaultPageConfigs -> appConfig();
+		$MVCparams['appSecret'] = $defaultPageConfigs -> appSecret();
   }
   
-  if($FBconfigFolder){
-    $this -> loadFile(array(
-	  'name' => 'FBconfig.php',
-	  'path' => $FBconfigFolder
-	));
-	$defaultPageConfigs = new FBappConfig(); 
-	$MVCparams['pageMeta'] = $defaultPageConfigs -> pageConfig();
-	$MVCparams['appMeta'] = $defaultPageConfigs -> appConfig();
-	$MVCparams['appSecret'] = $defaultPageConfigs -> appSecret();
-  }
-  
-  
-  $newClassController = setNewName(strtolower($appClass), 'class');
-  $newFileController = setNewName(strtolower($appClass), 'file');
-  
+  $newClassController = setNewName(strtolower($appClass), 'class'); // new-class-controller will be New_Class_Controller
+  $newFileController = setNewName(strtolower($appClass), 'file');  // new-file-controller will be New-File-Controller
   $isController = $this -> checkFile(array(
-	'name' => $newFileController.'Controller.php',
-	'path' => $appFolderDIR.DS.'controllers'.DS
+		'name' => $newFileController.'Controller.php',
+		'path' => $appFolderDIR.DS.'controllers'.DS
   ));  
   
   if($isController){
-	
-	if(!defined('CURRENTFOLDER')){
-	  define('CURRENTFOLDER',$currentFolder); 
-	}
-	$MVCparams['pageMeta']['currentPage'] = $appClass;
-	array_push($MVCparams['paths'], $appClass);
-	
-	  
-	$MVCparams['params']['controller'] = $appClass;
-	//$classController = new $newClassController($MVCparams);
-	
+		if(!defined('CURRENTFOLDER')){
+			define('CURRENTFOLDER',$currentFolder); 
+		}
+		$MVCparams['pageMeta']['currentPage'] = $appClass;
+		array_push($MVCparams['paths'], $appClass);
+		$MVCparams['params']['controller'] = $appClass;	
   }else{//if($isController){ 
-	  
 	  array_push($MVCparams['paths'], $appClass);
 	  $isStatic = $this -> checkFile(array(
 		'name' => strtolower($appClass.'.php'),
@@ -164,36 +160,30 @@
 		  ));
 	  
 	  if($isDefaultFileController){
-		if(!defined('CURRENTFOLDER'))
-		  define('CURRENTFOLDER',$currentFolder);
-		  
-		$newClassController = setNewName($defaultParams['classController'], 'class');
-		//$classController = new $tempClassController($MVCparams);
+			if(!defined('CURRENTFOLDER'))
+				define('CURRENTFOLDER',$currentFolder);
 
-		if(method_exists($newClassController,$appClass)){
-		   array_unshift($params, $appClass);
-		   
-		}else{
-		  $is404 = $this -> checkFile(array(
-			'name' => '404Controller.php',
-			'path' => $appFolderDIR.DS.'controllers'.DS
-		  ));
-		  if($is404)
-		    $newClassController = '_404';
-			//$classController = new _404($MVCparams);
-		}
-				
+			$newClassController = setNewName($defaultParams['classController'], 'class');
 
+			if(method_exists($newClassController,$appClass)){
+				 array_unshift($params, $appClass);
+			}else{
+				$is404 = $this -> checkFile(array(
+					'name' => '404Controller.php',
+					'path' => $appFolderDIR.DS.'controllers'.DS
+				));
+				if($is404)
+					$newClassController = '_404';
+			}
 	  }else{ //if($isDefaultFileController){
-  
 	   $is404 = $this -> checkFile(array(
-		  'name' => '404Controller.php',
-		  'path' => $appFolderDIR.DS.'controllers'.DS
-		));
+				'name' => '404Controller.php',
+				'path' => $appFolderDIR.DS.'controllers'.DS
+			));
 	  }////// if($isDefaultFileController){
   }///// if($isController){ 
 
-    if($is404 || $isStatic){
+	if($is404 || $isStatic){
 	  if(!defined('CURRENTFOLDER'))
 		define('CURRENTFOLDER',$currentFolder); 
 	}		
@@ -203,56 +193,46 @@
 	  $MVCparams['params']['controller'] = 'staticpage';
 	  $MVCparams['page'] = $appClass;
 	  $newClassController = 'MVC\Staticpage';
-	 // $classController = new MVC\Staticpage($MVCparams);
 	}elseif($is404){ //else if($isStatic)
-	 if($is404){
-		$MVCparams['params']['controller'] = '_404';
-		$newClassController = '_404';
-		//$classController = new _404($MVCparams);
+		if($is404){
+			$MVCparams['params']['controller'] = '_404';
+			$newClassController = '_404';
 	  }else{
-		$newClassController = '';
+			$newClassController = '';
 	  }
 	}
-  if(!$newClassController){//$classController){
-	$currentFolder = strtolower($defaultParams['app']); 
-  }
-  
+
+  if(!$newClassController)
+		$currentFolder = strtolower($defaultParams['app']); 
+
   if(!defined('CURRENTFOLDER'))
     define('CURRENTFOLDER',$currentFolder); 
-/* $currentFolder = $appFolder;
-  $appFolderDIR = 'applications'.DS.$currentFolder;
-  */  
+
   if(!defined('APPLICATIONFOLDERDIR'))
     define('APPLICATIONFOLDERDIR','applications'.DS.$currentFolder);
 	
   if(!defined('BASEHREF')){
-	$basehref = $this -> getBaseHref();
-	define('BASEHREF',$basehref);
-	
-	if($currentFolder !== strtolower($defaultParams['app']) && $currentFolder !== ''){
-	  $basehref .= $currentFolder . DS;
-    }
-	define('SHORTLINK',$basehref);
+		$basehref = $this -> getBaseHref();
+		define('BASEHREF',$basehref);
+
+		if($currentFolder !== strtolower($defaultParams['app']) && $currentFolder !== ''){
+			$basehref .= $currentFolder . DS;
+		}
+		define('SHORTLINK',$basehref);
   }
-  
- 
-  
+
   $defaultMethod = str_replace('-','_',strtolower($defaultParams['method'])); 
-  if($params)
-	$appMethod = array_shift($params);
-  else
-    $appMethod = $defaultMethod;
-  //$this -> jsonPrettyPrint(array($MVCparams, $appClass, $appFolderDIR, $isController));
+	$appMethod = !empty($params) ? array_shift($params) : $defaultMethod;
+
   if(!$newClassController)//$classController)
-	$newClassController = '_404';
-	//$classController = new _404($MVCparams);
+		$newClassController = '_404';
 
   if($MVCparams['pageMeta']['currentPage'] === $MVCparams['paths'][0])
-	array_shift($MVCparams['paths']);  
+		array_shift($MVCparams['paths']);  
 	
   if(!method_exists($newClassController,str_replace('-','_',strtolower($appMethod)))){
-	array_push($MVCparams['paths'], $appMethod);
-	$appMethod = $defaultMethod;
+		array_push($MVCparams['paths'], $appMethod);
+		$appMethod = $defaultMethod;
   }
   
   $MVCparams['params']['method'] = $appMethod;
@@ -262,32 +242,28 @@
   
   if($MVCparams['params']['method'] === $MVCparams['paths'][0])
     array_shift($MVCparams['paths']);
-  
-  $classController = new $newClassController($MVCparams);
- /* echo "Controller <br />";
-   var_dump($newClassController);
-  echo "<br />Method <br />";
-  exit;*/
-  
 
-  
-  
-  /*echo json_encode(array($params, $MVCparams['paths']));
-  exit;*/
+	if(!class_exists($newClassController) && $sandbox)
+  	exit("Sorry $newFileController file could not load class $newClassController."); 
+	elseif(!class_exists($newClassController))
+		$newClassController = '_404'; ///404
+
+		$classController = new $newClassController($MVCparams);
+	
   call_user_func(array($classController,$appMethod));
    
   function setNewName($string, $type='file'){
-	$temp = explode('-',strtolower($string));
-	$newString ='';
-	$separator = $type === 'file' ? '-' : '_';
-	foreach($temp as $word){
-	  $word = ucfirst(strtolower($word));
-	  $newString .= $newString === '' ? $word : $separator.$word;
-	}
-	if('type' === 'class'){
-	  if(strlen($newString) > 0 && ctype_digit(substr($newString, 0, 1)))
-	  $newString = '_' . $newString;
-	}
-	return $newString;
+		$temp = $type=='file' ? explode('-',str_replace('_','-',strtolower($string))) : explode('-',strtolower($string));
+		$newString ='';
+		$separator = $type === 'file' ? '-' : '_';
+		foreach($temp as $word){
+			$word = ucfirst(strtolower($word));
+			$newString .= $newString === '' ? $word : $separator.$word;
+		}
+		if('type' === 'class'){
+			if(strlen($newString) > 0 && ctype_digit(substr($newString, 0, 1)))
+			$newString = '_' . $newString;
+		}
+		return $newString;
   }
 ?>
