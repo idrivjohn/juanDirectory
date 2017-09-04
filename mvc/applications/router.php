@@ -33,7 +33,7 @@
 	
   $MVCparams['params'] = array();
   
-	$tempApp = !empty($params) ? strtolower(array_shift($params)) : strtolower($defaultParams['app']);
+	$tempApp = !empty($params) ? str_replace('-','_',strtolower(array_shift($params)) ): strtolower($defaultParams['app']);
 
   $isDirectory = $this -> checkDirectory(array(
 		'name' => strtolower($tempApp),
