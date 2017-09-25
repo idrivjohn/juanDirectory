@@ -1,0 +1,15 @@
+<IfModule mod_php5.c>
+  php_value short_open_tag 1
+</IfModule>
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  Options -Indexes
+  RewriteRule ^$ mvc/ [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_URI} !^mvc/
+  RewriteRule ^(.*)$ mvc/$1
+
+  RewriteCond %{SCRIPT_FILENAME} -d
+  RewriteRule ^mvc/(.*[^/])/$1 [R=301]
+</IfModule>
