@@ -2,12 +2,12 @@
 /**
  * JUANdirectory PHP Model-View-Controller Setup
  *
- * class.loader.php V1.0
+ * class.loader.php V1.1
  *
  * Author/Contributor : John Virdi V. Alfonso
  * Date   : 01 October 2014
  * Email  : jva.ipampanga@gmail.com
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -22,7 +22,7 @@ namespace MVC;
 (!defined('ROOTDIR'))?die('ILLEGAL ACCESS OF FILE'):'';
 
 /*
-  
+
   require will produce a fatal error (E_COMPILE_ERROR) and stop the script
   include will only produce a warning (E_WARNING) and the script will continue
 
@@ -32,56 +32,59 @@ class Loader{
   public function __construct()
   {
   }
- 
+
   public function loadFile($obj){
 	$fileName = $obj['name'];
 	$filePath = 'public'.$this -> ds;
 	$data = NULL;
-	if(isset($obj['path'])) $filePath = $obj['path']; 
-	if(isset($obj['data'])) $data = $obj['data']; 
-	
+	if(isset($obj['path'])) $filePath = $obj['path'];
+	if(isset($obj['data'])) $data = $obj['data'];
+
 	$isFile = $this -> checkFile(array(
 	  'name' => $fileName,
 	  'path' => $filePath
 	));
-	
+
 	if($isFile){
 	  $filePath = $filePath.$fileName;
 	  $filePath = ROOTDIR.$filePath;
 	  require_once($filePath);
-	  return true;  
-	}else{
-	  return  false;
-	}
-  }
-  
-  public function checkFile($obj){
-	$fileName = $obj['name'];
-	$filePath = 'public'.$this -> ds;
-	if(isset($obj['path'])) $filePath = $obj['path'];
-	$filePath = $filePath.$fileName;
-	if(is_file(ROOTDIR.$filePath)){
 	  return true;
 	}else{
 	  return  false;
 	}
   }
-  
-  public function checkDirectory($obj){
-	$isDirectory = false;
-	$directoryPath = 'public'.$this -> ds;
-	if(isset($obj['path'])) $directoryPath = $obj['path'];
-	$directories = glob(ROOTDIR.$directoryPath.'*',GLOB_ONLYDIR);
-	
-	foreach($directories as $directory){
-	  $directoryName = str_replace(ROOTDIR.$directoryPath,'',$directory);
-	  if (strtolower($directoryName) == $obj['name']){
-		$isDirectory =  true;
-		break;
-	  }
-	}
-	return $isDirectory;
+
+  public function checkFile($obj, $isRootPath = false){
+  	$fileName = $obj['name'];
+  	$filePath = 'public'.$this -> ds;
+  	if(isset($obj['path'])) $filePath = $obj['path'];
+  	$filePath = $isRootPath ? $filePath.$fileName : ROOTDIR.$filePath.$fileName;
+
+  	if(is_file($filePath)){
+  	  return true;
+  	}else{
+  	  return  false;
+  	}
   }
-  
+
+  public function checkDirectory($obj, $isRootPath = false){
+  	$isDirectory = false;
+  	$directoryPath = 'public'.$this -> ds;
+  	if(isset($obj['path']))
+      $directoryPath = $isRootPath ? $obj['path'] : ROOTDIR.$obj['path'];
+
+  	$directories = glob($directoryPath.'*',GLOB_ONLYDIR);
+
+  	foreach($directories as $directory){
+  	  $directoryName = str_replace($directoryPath,'',$directory);
+  	  if (strtolower($directoryName) == strtolower($obj['name'])){
+    		$isDirectory =  true;
+    		break;
+  	  }
+  	}
+  	return $isDirectory;
+  }
+
 }
 ?>
