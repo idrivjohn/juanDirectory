@@ -353,8 +353,11 @@ class Database extends Application{
 			//$key = substr(sha1($pkey,true),0,16);
 			$pKey = $pKey ? $pKey : $this->config['pkey'];
 			$value = base64_decode($value);
-			list($data, $iv) = explode('::',$value,2);
-			return openssl_decrypt($data, 'aes-256-ctr',$pKey,OPENSSL_RAW_DATA, $iv);
+			// to avoid getting undefined offset error
+			if(mb_strpos($value, '::')){
+				list($data, $iv) = explode('::',$value,2);
+				return openssl_decrypt($data, 'aes-256-ctr',$pKey,OPENSSL_RAW_DATA, $iv);
+			}
 			/*$pkey = $pKey ? $pKey : $this->config['pkey'];
 			$value = base64_decode($value);
 			$iv_size = mcrypt_get_iv_size(\MCRYPT_RIJNDAEL_256, \MCRYPT_MODE_CBC);
